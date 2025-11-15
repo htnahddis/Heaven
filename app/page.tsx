@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import Image from 'next/image';
+import Link from 'next/link';
 
-// 3D Model Component
 function ModelViewer({ modelPath }: { modelPath: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -12,11 +13,8 @@ function ModelViewer({ modelPath }: { modelPath: string }) {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    
-    // Scene setup
     const scene = new THREE.Scene();
 
-    // Camera
     const camera = new THREE.PerspectiveCamera(
       45,
       container.clientWidth / container.clientHeight,
@@ -25,7 +23,6 @@ function ModelViewer({ modelPath }: { modelPath: string }) {
     );
     camera.position.set(0, 0, 5);
 
-    // Renderer
     const renderer = new THREE.WebGLRenderer({ 
       antialias: true, 
       alpha: true 
@@ -35,7 +32,6 @@ function ModelViewer({ modelPath }: { modelPath: string }) {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
-    // Lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
@@ -53,14 +49,12 @@ function ModelViewer({ modelPath }: { modelPath: string }) {
 
     let model: THREE.Group;
 
-    // Load GLB model
     const loader = new GLTFLoader();
     loader.load(
       modelPath,
       (gltf) => {
         model = gltf.scene;
         
-        // Center and scale the model
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         model.position.sub(center);
@@ -78,7 +72,6 @@ function ModelViewer({ modelPath }: { modelPath: string }) {
       }
     );
 
-    // Animation loop
     let animationFrameId: number;
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
@@ -91,7 +84,6 @@ function ModelViewer({ modelPath }: { modelPath: string }) {
     };
     animate();
 
-    // Handle resize
     const handleResize = () => {
       const width = container.clientWidth;
       const height = container.clientHeight;
@@ -102,7 +94,6 @@ function ModelViewer({ modelPath }: { modelPath: string }) {
     };
     window.addEventListener('resize', handleResize);
 
-    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
@@ -116,7 +107,7 @@ function ModelViewer({ modelPath }: { modelPath: string }) {
   return <div ref={containerRef} className="w-full h-full" />;
 }
 
-// Main Homepage Component
+
 export default function HomePage() {
   const [scrollY, setScrollY] = useState(0);
 
@@ -128,7 +119,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden relative">
-      {/* Abstract Background Pattern */}
       <div className="absolute inset-0 opacity-20">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -143,31 +133,27 @@ export default function HomePage() {
         </svg>
       </div>
 
-      {/* Navigation */}
+
       <nav className="relative z-50 flex items-center justify-between px-8 py-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center text-2xl font-bold">
-            H
-          </div>
+          <Image src="/logo.png" alt='logo' width={100} height={100}/>
           <span className="text-2xl font-bold tracking-wider">HEAVEN</span>
         </div>
         
-        <div className="flex items-center gap-12">
+        {/* <div className="flex items-center gap-12">
           <a href="#" className="hover:text-orange-400 transition-colors">Home</a>
           <a href="#" className="hover:text-orange-400 transition-colors">About us</a>
-          <a href="#" className="hover:text-orange-400 transition-colors">Portfolio</a>
           <a href="#" className="hover:text-orange-400 transition-colors">News</a>
-        </div>
+        </div> */}
 
-        <button className="bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-semibold px-6 py-3 rounded-lg hover:shadow-lg hover:shadow-orange-500/50 transition-all duration-300 transform hover:scale-105">
+        <Link href='/login'><button className="bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-semibold px-6 py-3 rounded-lg hover:shadow-lg hover:shadow-orange-500/50 transition-all duration-300 transform hover:scale-105 cursor-pointer">
           LOGIN/SIGNUP
-        </button>
+        </button></Link>
       </nav>
 
-      {/* Hero Section */}
+
       <div className="relative z-10 container mx-auto px-8 pt-20 pb-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
           <div className="space-y-8">
             <div className="text-orange-400 font-semibold text-lg tracking-wide animate-pulse">
               Proved By prodesigner
@@ -189,13 +175,9 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Right Content - 3D Model */}
           <div className="relative flex items-center justify-center h-[600px]">
-            {/* Glow Effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-            
-            {/* 3D Model Container */}
-            <div 
+              <div 
               className="relative w-full h-full z-10"
               style={{ transform: `translateY(${scrollY * 0.1}px)` }}
             >
@@ -205,14 +187,13 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Large Background Text */}
+
       <div className="absolute bottom-0 left-0 right-0 overflow-hidden pointer-events-none">
-        <h2 className="text-[20rem] font-bold text-gray-900 opacity-30 whitespace-nowrap leading-none">
+        <h2 className="text-[20rem] font-bold text-gray-800 opacity-50 whitespace-nowrap leading-none">
           HEAVEN
         </h2>
       </div>
 
-      {/* Floating Elements */}
       <div className="absolute top-1/4 left-10 w-4 h-4 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
       <div className="absolute top-1/3 right-20 w-6 h-6 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
       <div className="absolute bottom-1/4 left-1/4 w-3 h-3 bg-orange-300 rounded-full animate-bounce" style={{ animationDelay: '1s' }}></div>
