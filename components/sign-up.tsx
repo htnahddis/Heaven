@@ -10,6 +10,7 @@ import { Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ErrorContext } from "better-auth/react";
 
 export default function SignUp() {
   const [username, setUsername] = useState("");
@@ -121,7 +122,7 @@ export default function SignUp() {
               </div>
             </div>
 
-            {/* Sign Up Button */}
+        
             <Button
               type="submit"
               className="w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold cursor-pointer"
@@ -136,7 +137,9 @@ export default function SignUp() {
                   fetchOptions: {
                     onResponse: () => setLoading(false),
                     onRequest: () => setLoading(true),
-                    onError: (ctx) => toast.error(ctx.error.message),
+                    onError: async (ctx: ErrorContext) => {
+                    toast.error(ctx.error.message);
+                                           },
                     onSuccess: async () => router.push("/dashboard"),
                   },
                 });
