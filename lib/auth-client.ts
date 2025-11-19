@@ -1,35 +1,17 @@
+// lib/auth-client.ts (client)
+"use client";
+
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   endpoints: {
-    signIn: '/api/auth/login',
-    signUp: '/api/auth/register',
-    signOut: '/api/auth/signout',
-    session: '/api/auth/session',
-  },
-  callbacks: {
-    jwt: async ({ token, user }) => {
-      if (user) {
-        token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
-        token.image = user.image;
-      }
-      return token;
-    },
-    session: async ({ session, token }) => {
-      if (token) {
-        session.user = {
-          id: token.id as string,
-          name: token.name as string,
-          email: token.email as string,
-          image: token.image as string | undefined,
-        };
-      }
-      return session;
-    },
+    // these endpoints will be routed to /api/auth/* by the server route above
+    signIn: "/api/auth/email/signin",     // typical path; library may use /email/signin
+    signUp: "/api/auth/email/register",   // typical path; adapt if your library expects different
+    signOut: "/api/auth/signout",
+    session: "/api/auth/session",
+    // If better-auth uses different names for email provider endpoints, adjust them to match library docs.
   },
 });
-
 export const { signIn, signOut, signUp, useSession } = authClient;

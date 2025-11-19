@@ -135,13 +135,14 @@ export default function SignUp() {
                   image: image ? await convertImageToBase64(image) : "",
                   callbackURL: "/events",
                   fetchOptions: {
-                    onResponse: () => setLoading(false),
                     onRequest: () => setLoading(true),
-                    onError: async (ctx: ErrorContext) => {
-                      toast.error(ctx.error.message);
-                    },
-                    onSuccess: async () => {
+                    onResponse: () => {
+                      setLoading(false);
                       window.location.href = '/profile';
+                    },
+                    onError: (ctx) => {
+                      setLoading(false);
+                      toast.error(ctx.error?.message || "Signup failed");
                     },
                   },
                 });

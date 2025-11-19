@@ -1,11 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Briefcase, DollarSign, ChevronRight, Menu, X } from 'lucide-react';
 
 export default function JobPortal() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Search state
+  const [jobTitle, setJobTitle] = useState('');
+  const [jobLocation, setJobLocation] = useState('');
+  const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
 
   const bannerImages = [
 
@@ -104,8 +109,40 @@ export default function JobPortal() {
     }
   ];
 
+  // Initialize filteredJobs with all jobs
+  useEffect(() => {
+    setFilteredJobs(jobs);
+  }, []);
+
+  // Search functionality
+  const handleSearch = () => {
+    const filtered = jobs.filter(job => {
+      const titleMatch = jobTitle === '' || 
+        job.title.toLowerCase().includes(jobTitle.toLowerCase()) ||
+        job.company.toLowerCase().includes(jobTitle.toLowerCase()) ||
+        job.tags.some(tag => tag.toLowerCase().includes(jobTitle.toLowerCase()));
+      
+      const locationMatch = jobLocation === '' || 
+        job.location.toLowerCase().includes(jobLocation.toLowerCase());
+      
+      return titleMatch && locationMatch;
+    });
+    setFilteredJobs(filtered);
+  };
+
+  const handleClearSearch = () => {
+    setJobTitle('');
+    setJobLocation('');
+    setFilteredJobs(jobs);
+  };
+
+  // Auto-search when inputs change
+  useEffect(() => {
+    handleSearch();
+  }, [jobTitle, jobLocation]);
+
   return (
-    <div className="min-h-screen text-white relative overflow-hidden bg-black">
+    <div className="min-h-screen text-white relative overflow-hidden bg-black mt-15">
      
 
       <style jsx>{`
@@ -261,6 +298,8 @@ export default function JobPortal() {
                 <input 
                   type="text" 
                   placeholder="Job title, Keyword..."
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
                   className="bg-transparent outline-none w-full text-white placeholder-gray-400 focus:placeholder-gray-500 transition-colors"
                 />
               </div>
@@ -269,10 +308,15 @@ export default function JobPortal() {
                 <input 
                   type="text" 
                   placeholder="Your Location"
+                  value={jobLocation}
+                  onChange={(e) => setJobLocation(e.target.value)}
                   className="bg-transparent outline-none w-full text-white placeholder-gray-400 focus:placeholder-gray-500 transition-colors"
                 />
               </div>
-              <button className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 px-8 py-3 rounded-lg transition-all duration-300 font-medium shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105">
+              <button 
+                onClick={handleSearch}
+                className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 px-8 py-3 rounded-lg transition-all duration-300 font-medium shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105"
+              >
                 Find Job
               </button>
             </div>
@@ -311,50 +355,62 @@ export default function JobPortal() {
           </div>
 
           <div className="space-y-4">
-            {jobs.map((job, idx) => (
-              <div 
-                key={job.id} 
-                className="glass-card glass-card-hover rounded-xl p-6 transition-all duration-300"
-                style={{ animationDelay: `${idx * 0.1}s` }}
-              >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-600/20 to-yellow-600/20 rounded-lg flex-shrink-0 border border-orange-500/30 flex items-center justify-center">
-                      <Briefcase className="w-6 h-6 text-orange-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold mb-2 hover:text-orange-400 transition-colors cursor-pointer">
-                        {job.title}
-                      </h3>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-3">
-                        <span className="flex items-center gap-1 hover:text-orange-400 transition-colors">
-                          <Briefcase size={16} />
-                          {job.company}
-                        </span>
-                        <span className="flex items-center gap-1 hover:text-orange-400 transition-colors">
-                          <MapPin size={16} />
-                          {job.location}
-                        </span>
-                        <span className="flex items-center gap-1 hover:text-orange-400 transition-colors">
-                          <DollarSign size={16} />
-                          {job.salary}
-                        </span>
+            {filteredJobs.length > 0 ? (
+              filteredJobs.map((job, idx) => (
+                <div 
+                  key={job.id} 
+                  className="glass-card glass-card-hover rounded-xl p-6 transition-all duration-300"
+                  style={{ animationDelay: `${idx * 0.1}s` }}
+                >
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-orange-600/20 to-yellow-600/20 rounded-lg flex-shrink-0 border border-orange-500/30 flex items-center justify-center">
+                        <Briefcase className="w-6 h-6 text-orange-400" />
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {job.tags.map((tag, index) => (
-                          <span key={index} className="px-3 py-1 glass-card text-gray-300 rounded-full text-xs hover:bg-orange-500/10 hover:border-orange-500/30 transition-all duration-300">
-                            {tag}
+                      <div>
+                        <h3 className="text-xl font-semibold mb-2 hover:text-orange-400 transition-colors cursor-pointer">
+                          {job.title}
+                        </h3>
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-3">
+                          <span className="flex items-center gap-1 hover:text-orange-400 transition-colors">
+                            <Briefcase size={16} />
+                            {job.company}
                           </span>
-                        ))}
+                          <span className="flex items-center gap-1 hover:text-orange-400 transition-colors">
+                            <MapPin size={16} />
+                            {job.location}
+                          </span>
+                          <span className="flex items-center gap-1 hover:text-orange-400 transition-colors">
+                            <DollarSign size={16} />
+                            {job.salary}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {job.tags.map((tag: string, index: number) => (
+                            <span key={index} className="px-3 py-1 glass-card text-gray-300 rounded-full text-xs hover:bg-orange-500/10 hover:border-orange-500/30 transition-all duration-300">
+                              {tag}
+                            </span>
+                          ))} // Added closing parenthesis here
+                        </div>
                       </div>
                     </div>
+                    <button className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 px-6 py-2 rounded-lg transition-all duration-300 whitespace-nowrap font-medium shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105">
+                      Apply Now
+                    </button>
                   </div>
-                  <button className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 px-6 py-2 rounded-lg transition-all duration-300 whitespace-nowrap font-medium shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105">
-                    Apply Now
-                  </button>
                 </div>
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-400 text-lg mb-4">No jobs found matching your criteria.</p>
+                <button
+                  onClick={handleClearSearch}
+                  className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 px-6 py-2 rounded-lg transition-all duration-300 font-medium shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105"
+                >
+                  Clear Search
+                </button>
               </div>
-            ))}
+            )}
           </div>
         </div>
 

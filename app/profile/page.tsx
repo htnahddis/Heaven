@@ -1,5 +1,6 @@
 'use client';
-
+import Link from 'next/link';
+import Image from 'next/image';
 import React, { useState } from 'react';
 import { Search, ChevronDown, TrendingUp, Award, Target } from 'lucide-react';
 
@@ -41,7 +42,7 @@ export default function PlayerProfile() {
   };
 
   return (
-    <div className="min-h-screen text-white relative overflow-hidden">
+    <div className="min-h-screen text-white relative overflow-hidden mt-30">
       {/* Advanced Animated Gradient Background */}
       <div className="fixed inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-orange-950 to-slate-950"></div>
@@ -137,25 +138,22 @@ export default function PlayerProfile() {
       `}</style>
 
       {/* Header */}
-      <header className="border-b border-orange-500/20 relative z-10">
-        <div className="glass-card">
-          <div className="flex items-center justify-between px-6 py-4 max-w-[1600px] mx-auto">
-            <div className="flex items-center gap-4">
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-600 to-yellow-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
-                  <input
-                    type="text"
-                    placeholder="Search player, team..."
-                    className="bg-slate-900/50 border border-orange-500/30 rounded-lg px-10 py-2.5 text-sm w-80 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/50 transition-all backdrop-blur-xl placeholder:text-gray-500"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* <nav className="bg-black text-white p-4 z-1">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Image src="/logo.png" alt="logo" width={100} height={100} />
+          <span className="text-2xl font-bold tracking-wider">HEAVEN</span>
         </div>
-      </header>
+
+        <div className="flex gap-6">
+          <Link href="/" className={`hover:text-orange-400 transition`}>Home</Link>
+          <Link href="/event" className={`hover:text-orange-400 transition`}>Events</Link>
+          <Link href="/job-section" className={`hover:text-orange-400 transition`}>Jobs</Link>
+        </div>
+
+        
+      </div>
+    </nav> */}
 
       {/* Main Content */}
       <div className="px-6 py-8 relative z-10 max-w-[1600px] mx-auto">

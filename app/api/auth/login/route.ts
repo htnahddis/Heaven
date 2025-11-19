@@ -4,6 +4,7 @@ import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const COOKIE_NAME='token';
 
 export async function POST(request: Request) {
   try {
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
 
     // Create JWT token
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { id: user._id.toString(), email: user.email },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -47,11 +48,23 @@ export async function POST(request: Request) {
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user.toObject();
 
-    return NextResponse.json({
-      user: userWithoutPassword,
-      token,
-      message: 'Login successful',
-    });
+    // Set cookie header (HttpOnly, Secure in prod)
+    const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookie = `${COOKIE_NAME}=${token}; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Lax${
+      isProd ? '; Secure' : ''
+    }`;
+
+
+    return NextResponse.json(
+      { user: userWithoutPassword, message: 'Login successful' },
+      {
+        status: 200,
+        headers: {
+          'Set-Cookie': cookie,
+        },
+      }
+    );
   } catch (error: any) {
     console.error('Login error:', error);
     return NextResponse.json(

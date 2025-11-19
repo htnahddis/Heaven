@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2 } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export default function SignIn() {
@@ -76,6 +77,10 @@ export default function SignIn() {
                     onResponse: () => {
                       setLoading(false);
                       window.location.href = '/profile';
+                    },
+                    onError: (ctx) => {
+                      setLoading(false);
+                      toast.error(ctx.error.message);
                     },
                   }
                 );
