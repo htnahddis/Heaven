@@ -134,22 +134,7 @@ export default function HomePage() {
       </div>
 
 
-      <nav className="relative z-50 flex items-center justify-between px-8 py-6">
-        <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt='logo' width={100} height={100}/>
-          <span className="text-2xl font-bold tracking-wider">HEAVEN</span>
-        </div>
-        
-        {/* <div className="flex items-center gap-12">
-          <a href="#" className="hover:text-orange-400 transition-colors">Home</a>
-          <a href="#" className="hover:text-orange-400 transition-colors">About us</a>
-          <a href="#" className="hover:text-orange-400 transition-colors">News</a>
-        </div> */}
-
-        <Link href='/login'><button className="bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-semibold px-6 py-3 rounded-lg hover:shadow-lg hover:shadow-orange-500/50 transition-all duration-300 transform hover:scale-105 cursor-pointer">
-          LOGIN/SIGNUP
-        </button></Link>
-      </nav>
+     
 
 
       <div className="relative z-10 container mx-auto px-8 pt-20 pb-32">
