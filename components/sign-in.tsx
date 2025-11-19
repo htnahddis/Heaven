@@ -20,7 +20,7 @@ export default function SignIn() {
     <div className="min-h-screen flex items-center justify-center bg-black text-white px-6">
       <div className="max-w-6xl w-full grid md:grid-cols-2 gap-10 items-center">
         
-        {/* LEFT SECTION: LOGIN FORM */}
+     
         <div className="max-w-md w-full">
           <div className="mb-8">
             <h1 className="text-3xl md:text-4xl font-bold leading-tight">
