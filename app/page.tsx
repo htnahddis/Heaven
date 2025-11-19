@@ -118,7 +118,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden relative">
+    <div className="min-h-screen bg-black text-white overflow-hidden relative mt-15">
       <div className="absolute inset-0 opacity-20">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -134,7 +134,21 @@ export default function HomePage() {
       </div>
 
 
+<<<<<<< HEAD
      
+=======
+      {/* <nav className="relative z-50 flex items-center justify-between px-8 py-6">
+        <div className="flex items-center gap-3">
+          <Image src="/logo.png" alt='logo' width={100} height={100}/>
+          <span className="text-2xl font-bold tracking-wider">HEAVEN</span>
+        </div>
+        
+
+        <Link href='/login'><button className="bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-semibold px-6 py-3 rounded-lg hover:shadow-lg hover:shadow-orange-500/50 transition-all duration-300 transform hover:scale-105 cursor-pointer">
+          LOGIN/SIGNUP
+        </button></Link>
+      </nav> */}
+>>>>>>> 42c92129a62497d2641f4cf963fbdb50f83a5c42
 
 
       <div className="relative z-10 container mx-auto px-8 pt-20 pb-32">

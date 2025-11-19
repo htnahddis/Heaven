@@ -10,7 +10,6 @@ import { Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ErrorContext } from "better-auth/react";
 
 export default function SignUp() {
   const [username, setUsername] = useState("");
@@ -31,11 +30,40 @@ export default function SignUp() {
     }
   };
 
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      let imageBase64 = "";
+      if (image) {
+        imageBase64 = await convertImageToBase64(image);
+      }
+
+      const result = await signUp.email({
+        email,
+        password,
+        name: username,
+        image: imageBase64,
+      });
+
+      if (result.error) {
+        toast.error(result.error.message || "Sign up failed");
+      } else {
+        toast.success("Account created successfully!");
+        router.push("/profile");
+        router.refresh();
+      }
+    } catch (error) {
+      toast.error("An error occurred during sign up");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white px-6">
       <div className="max-w-6xl w-full grid md:grid-cols-2 gap-10 items-center">
-        
-        {/* LEFT SECTION: SIGN UP FORM */}
         <div className="max-w-md w-full">
           <div className="mb-8">
             <h1 className="text-3xl md:text-4xl font-bold leading-tight">
@@ -46,8 +74,7 @@ export default function SignUp() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-5">
-            {/* Username */}
+          <form onSubmit={handleSignUp} className="flex flex-col gap-5">
             <div>
               <Label htmlFor="username" className="text-gray-300">Username</Label>
               <Input
@@ -57,10 +84,10 @@ export default function SignUp() {
                 className="bg-transparent border-gray-700 text-white mt-2"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                required
               />
             </div>
 
-            {/* Email */}
             <div>
               <Label htmlFor="email" className="text-gray-300">Email</Label>
               <Input
@@ -70,28 +97,29 @@ export default function SignUp() {
                 className="bg-transparent border-gray-700 text-white mt-2"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
 
-            {/* Password */}
             <div>
               <Label htmlFor="password" className="text-gray-300">Password</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Enter your password (min 6 characters)"
                 className="bg-transparent border-gray-700 text-white mt-2"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
               />
             </div>
 
-            {/* Profile Image */}
             <div>
               <Label htmlFor="image" className="text-gray-300">
                 Profile Image (optional)
               </Label>
-              <div className="flex items-center gap-3 text-white">
+              <div className="flex items-center gap-3">
                 {imagePreview && (
                   <div className="relative w-14 h-14 rounded-md overflow-hidden border border-gray-700 mt-2">
                     <Image
@@ -122,30 +150,10 @@ export default function SignUp() {
               </div>
             </div>
 
-        
             <Button
               type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold cursor-pointer"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold"
               disabled={loading}
-              onClick={async () => {
-                await signUp.email({
-                  email,
-                  password,
-                  name: username,
-                  image: image ? await convertImageToBase64(image) : "",
-                  callbackURL: "/events",
-                  fetchOptions: {
-                    onResponse: () => setLoading(false),
-                    onRequest: () => setLoading(true),
-                    onError: async (ctx: ErrorContext) => {
-                      toast.error(ctx.error.message);
-                    },
-                    onSuccess: async () => {
-                      window.location.href = '/profile';
-                    },
-                  },
-                });
-              }}
             >
               {loading ? <Loader2 className="animate-spin" size={16} /> : "SIGN UP"}
             </Button>
@@ -156,10 +164,9 @@ export default function SignUp() {
                 Sign In
               </Link>
             </p>
-          </div>
+          </form>
         </div>
 
-        {/* RIGHT SECTION: INFO */}
         <div className="space-y-6">
           <div>
             <h2 className="text-lg font-semibold text-blue-500">01</h2>

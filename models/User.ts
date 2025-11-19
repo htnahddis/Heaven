@@ -1,14 +1,13 @@
+// models/User.ts - Simplified for Better Auth
 import mongoose, { Document, Schema } from 'mongoose';
-import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
   name: string;
   email: string;
-  password: string;
   image?: string;
   createdAt: Date;
   updatedAt: Date;
-  comparePassword(candidatePassword: string): Promise<boolean>;
+  // Better Auth will handle password hashing
 }
 
 const userSchema = new Schema<IUser>(
@@ -30,12 +29,6 @@ const userSchema = new Schema<IUser>(
         'Please provide a valid email',
       ],
     },
-    password: {
-      type: String,
-      required: [true, 'Please provide a password'],
-      minlength: [6, 'Password must be at least 6 characters long'],
-      select: false,
-    },
     image: {
       type: String,
       default: '',
@@ -45,26 +38,6 @@ const userSchema = new Schema<IUser>(
     timestamps: true,
   }
 );
-
-// Hash password before saving
-userSchema.pre<IUser>('save', async function (next) {
-  if (!this.isModified('password')) return next();
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error: any) {
-    next(error);
-  }
-});
-
-// Method to compare password
-userSchema.methods.comparePassword = async function (
-  candidatePassword: string
-): Promise<boolean> {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
 
 const User = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 

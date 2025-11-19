@@ -1,13 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Search, MapPin, Calendar, Users } from 'lucide-react';
 
 export default function EventsPage() {
-  const [lookingFor, setLookingFor] = useState('');
-  const [location, setLocation] = useState('');
-  const [when, setWhen] = useState('');
-
   const events = [
     {
       id: 1,
@@ -58,6 +54,59 @@ export default function EventsPage() {
       type: 'flames'
     }
   ];
+
+  const [lookingFor, setLookingFor] = useState('');
+  const [location, setLocation] = useState('');
+  const [when, setWhen] = useState('');
+  const [filteredEvents, setFilteredEvents] = useState(events);
+
+  const handleSearch = () => {
+    let filtered = events;
+
+    // Filter by looking for (search in title)
+    if (lookingFor.trim()) {
+      filtered = filtered.filter(event =>
+        event.title.toLowerCase().includes(lookingFor.toLowerCase())
+      );
+    }
+
+    // Filter by location
+    if (location.trim()) {
+      filtered = filtered.filter(event =>
+        event.venue.toLowerCase().includes(location.toLowerCase())
+      );
+    }
+
+    // Filter by date/when
+    if (when.trim()) {
+      filtered = filtered.filter(event =>
+        event.date.toLowerCase().includes(when.toLowerCase())
+      );
+    }
+
+    setFilteredEvents(filtered);
+  };
+
+  const handleClearSearch = () => {
+    setLookingFor('');
+    setLocation('');
+    setWhen('');
+    setFilteredEvents(events);
+  };
+
+  // Auto-search when any filter changes
+  useEffect(() => {
+    if (lookingFor || location || when) {
+      handleSearch();
+    } else {
+      setFilteredEvents(events);
+    }
+  }, [lookingFor, location, when]);
+
+  // Initialize filteredEvents with all events
+  useEffect(() => {
+    setFilteredEvents(events);
+  }, []);
 
   return (
     <div className="min-h-screen text-white relative overflow-hidden bg-black">
@@ -189,7 +238,10 @@ export default function EventsPage() {
                   />
                 </div>
 
-                <button className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white p-4 rounded-lg transition-all duration-300 shadow-lg shadow-orange-500/50 hover:shadow-orange-500/70 hover:scale-105">
+                <button 
+                  onClick={handleSearch}
+                  className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white p-4 rounded-lg transition-all duration-300 shadow-lg shadow-orange-500/50 hover:shadow-orange-500/70 hover:scale-105"
+                >
                   <Search className="w-6 h-6" />
                 </button>
               </div>
@@ -205,49 +257,65 @@ export default function EventsPage() {
 
           {/* Events Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {events.map((event) => (
-              <div
-                key={event.id}
-                className="glass-card glass-card-hover rounded-xl overflow-hidden transition-all duration-300 cursor-pointer group"
-              >
-                {/* Event Image */}
-                <div className="relative h-72 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent z-10"></div>
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  {event.type === 'flames' && (
-                    <div className="absolute inset-0 bg-orange-600/30 group-hover:bg-orange-600/40 transition-colors"></div>
-                  )}
-                  {event.type === 'flames-stage' && (
-                    <div className="absolute inset-0 bg-amber-600/30 group-hover:bg-amber-600/40 transition-colors"></div>
-                  )}
-                  {event.type === 'concert' && (
-                    <div className="absolute inset-0 bg-yellow-600/30 group-hover:bg-yellow-600/40 transition-colors"></div>
-                  )}
-                  
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-orange-600/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
-                </div>
+            {filteredEvents.length > 0 ? (
+              filteredEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="glass-card glass-card-hover rounded-xl overflow-hidden transition-all duration-300 cursor-pointer group"
+                >
+                  {/* Event Image */}
+                  <div className="relative h-72 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent z-10"></div>
+                    <img
+                      src={event.image}
+                      alt={event.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    {event.type === 'flames' && (
+                      <div className="absolute inset-0 bg-orange-600/30 group-hover:bg-orange-600/40 transition-colors"></div>
+                    )}
+                    {event.type === 'flames-stage' && (
+                      <div className="absolute inset-0 bg-amber-600/30 group-hover:bg-amber-600/40 transition-colors"></div>
+                    )}
+                    {event.type === 'concert' && (
+                      <div className="absolute inset-0 bg-yellow-600/30 group-hover:bg-yellow-600/40 transition-colors"></div>
+                    )}
+                    
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-orange-600/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
+                  </div>
 
-                {/* Event Info */}
-                <div className="p-5 relative">
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"></div>
-                  <h3 className="text-orange-400 text-base font-bold mb-2 group-hover:text-orange-300 transition-colors">
-                    {event.title}
-                  </h3>
-                  <div className="flex items-center gap-2 text-sm text-gray-400">
-                    <Calendar className="w-4 h-4 text-orange-500/70" />
-                    <span>{event.date}</span>
-                    <span className="text-orange-500/50">•</span>
-                    <MapPin className="w-4 h-4 text-orange-500/70" />
-                    <span>{event.venue}</span>
+                  {/* Event Info */}
+                  <div className="p-5 relative">
+                    <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"></div>
+                    <h3 className="text-orange-400 text-base font-bold mb-2 group-hover:text-orange-300 transition-colors">
+                      {event.title}
+                    </h3>
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <Calendar className="w-4 h-4 text-orange-500/70" />
+                      <span>{event.date}</span>
+                      <span className="text-orange-500/50">•</span>
+                      <MapPin className="w-4 h-4 text-orange-500/70" />
+                      <span>{event.venue}</span>
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-16">
+                <div className="glass-card rounded-xl p-8">
+                  <Search className="w-16 h-16 text-orange-500/50 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-white mb-2">No events found</h3>
+                  <p className="text-gray-400 mb-6">Try adjusting your search criteria or clear all filters</p>
+                  <button
+                    onClick={handleClearSearch}
+                    className="px-6 py-3 bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-orange-500/50 hover:shadow-orange-500/70 hover:scale-105"
+                  >
+                    Clear Search
+                  </button>
+                </div>
               </div>
-            ))}
+            )}
           </div>
 
           {/* Load More Button */}
