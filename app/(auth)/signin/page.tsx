@@ -123,7 +123,7 @@ export default function SignIn() {
             <Button
               type="button"
               variant="outline"
-              className="w-full border-gray-700 text-white hover:bg-gray-900 gap-2"
+              className="w-full border-gray-700 text-black hover:bg-gray-900 gap-2 hover:text-white"
               disabled={loading}
               onClick={handleGoogleSignIn}
             >

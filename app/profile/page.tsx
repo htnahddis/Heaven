@@ -172,9 +172,9 @@ export default function PlayerProfile() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
               </div>
               <div className="p-6 text-center text-sm text-gray-300 leading-relaxed">
-                I'm an Indian gamer who grew up with the classic mix of school stress, street cricket, and late-night gaming sessions. What started as a hobby with casual mobile games slowly turned into a passion for competitive multiplayer titles, strategy gameplay, and the challenge of constantly improving.
+                Im an Indian gamer who grew up with the classic mix of school stress, street cricket, and late-night gaming sessions. What started as a hobby with casual mobile games slowly turned into a passion for competitive multiplayer titles, strategy gameplay, and the challenge of constantly improving.
 
-                I love exploring new games, understanding their mechanics, and experimenting with different playstyles. Whether it's grinding ranked matches, trying out fresh launches, or revisiting nostalgic classics, gaming has always been my way to disconnect and recharge.
+                I love exploring new games, understanding their mechanics, and experimenting with different playstyles. Whether its grinding ranked matches, trying out fresh launches, or revisiting nostalgic classics, gaming has always been my way to disconnect and recharge.
               </div>
             </div>
           </div>

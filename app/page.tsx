@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTFLoader } from 'three-stdlib';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -165,7 +165,7 @@ From jobs to tournaments, it’s the platform where every gamer levels up.
             </div>
 
             <button className="group bg-gradient-to-r from-orange-400 to-yellow-400 text-black font-semibold px-8 py-4 rounded-full hover:shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 transform hover:scale-105">
-              Let's go!
+              Lets go!
               <span className="inline-block ml-2 group-hover:translate-x-2 transition-transform">→</span>
             </button>
           </div>
