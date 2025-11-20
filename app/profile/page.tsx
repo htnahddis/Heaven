@@ -1,12 +1,101 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import React, { useState } from 'react';
-import { Search, ChevronDown, TrendingUp, Award, Target } from 'lucide-react';
+import { usePathname } from "next/navigation";
+import { useSession, signOut } from "@/lib/auth-client";
+import React, { useState, useEffect } from 'react';
+
+import { Search, ChevronDown, TrendingUp, Award, Target, Edit2, Save, X, Trash2 } from 'lucide-react';
 
 export default function PlayerProfile() {
   const [activeTab, setActiveTab] = useState('ALL/T');
   const [activeFilter, setActiveFilter] = useState('Rating');
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempName, setTempName] = useState('');
+  const pathname = usePathname();
+  const { data: session, isPending } = useSession();
+   
+  // Initialize with default values
+  const [user, setUser] = useState({
+    name: "player123",
+    email: "player@example.com",
+  });
+
+  // Load user data - prioritize session over localStorage
+  useEffect(() => {
+    if (session?.user) {
+      // Check if we have saved custom data for this user
+      const savedUser = localStorage.getItem('playerProfile');
+      
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser);
+          // Only use saved data if email matches current session
+          if (parsed.email === session.user.email) {
+            setUser(parsed);
+          } else {
+            // New user logged in, use session data
+            setUser({
+              name: session.user.name || 'player123',
+              email: session.user.email || '',
+            });
+          }
+        } catch (error) {
+          console.error('Error parsing saved user data:', error);
+          // Fallback to session data
+          setUser({
+            name: session.user.name || 'player123',
+            email: session.user.email || '',
+          });
+        }
+      } else {
+        // No saved data, use session data
+        setUser({
+          name: session.user.name || 'player123',
+          email: session.user.email || '',
+        });
+      }
+    }
+  }, [session]);
+
+  // Save user data to localStorage only when manually changed
+  // NOT on initial load
+  useEffect(() => {
+    // Only save if user is logged in and data has been loaded
+    if (session?.user && user.email === session.user.email) {
+      localStorage.setItem('playerProfile', JSON.stringify(user));
+    }
+  }, [user, session]);
+
+  // UPDATE: Start editing mode
+  const handleEditClick = () => {
+    setTempName(user.name);
+    setIsEditing(true);
+  };
+
+  // UPDATE: Save the edited name
+  const handleSaveName = () => {
+    if (tempName.trim()) {
+      setUser({ ...user, name: tempName.trim() });
+      setIsEditing(false);
+    }
+  };
+
+  // UPDATE: Cancel editing
+  const handleCancelEdit = () => {
+    setTempName('');
+    setIsEditing(false);
+  };
+
+  // DELETE: Reset to session name
+  const handleDeleteName = () => {
+    if (confirm('Are you sure you want to reset your profile name?')) {
+      setUser({ 
+        ...user, 
+        name: session?.user?.name || 'player123' 
+      });
+    }
+  };
 
   const statBars = [
     { label: 'Rating', value: 2.0, max: 2.5, color: 'from-orange-500 via-amber-500 to-yellow-500' },
@@ -35,11 +124,6 @@ export default function PlayerProfile() {
     { label: 'K/D Diff', value: '5.69', highlight: true },
     { label: 'AoR', value: '85.37', sub: '89.34' },
   ];
-
-  const user = {
-    name: 'FAKER',
-    email: 'faker@example.com',
-  };
 
   return (
     <div className="min-h-screen text-white relative overflow-hidden mt-30">
@@ -137,24 +221,6 @@ export default function PlayerProfile() {
         }
       `}</style>
 
-      {/* Header */}
-      {/* <nav className="bg-black text-white p-4 z-1">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="logo" width={100} height={100} />
-          <span className="text-2xl font-bold tracking-wider">HEAVEN</span>
-        </div>
-
-        <div className="flex gap-6">
-          <Link href="/" className={`hover:text-orange-400 transition`}>Home</Link>
-          <Link href="/event" className={`hover:text-orange-400 transition`}>Events</Link>
-          <Link href="/job-section" className={`hover:text-orange-400 transition`}>Jobs</Link>
-        </div>
-
-        
-      </div>
-    </nav> */}
-
       {/* Main Content */}
       <div className="px-6 py-8 relative z-10 max-w-[1600px] mx-auto">
         <div className="grid grid-cols-12 gap-8">
@@ -181,13 +247,62 @@ export default function PlayerProfile() {
 
           {/* Right Column - Stats */}
           <div className="col-span-9 space-y-8">
-            {/* Player Header */}
+            {/* Player Header with CRUD Operations */}
             <div className="glass-card glass-card-hover rounded-2xl p-8 transition-all duration-500">
               <div className="flex items-end justify-between mb-8">
-                <div>
-                  <h1 className="text-6xl font-black mb-3 bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-400 bg-clip-text text-transparent">
-                    {user.name}
-                  </h1>
+                <div className="flex-1">
+                  {isEditing ? (
+                    // EDIT MODE
+                    <div className="flex items-center gap-4 mb-3">
+                      <input
+                        type="text"
+                        value={tempName}
+                        onChange={(e) => setTempName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleSaveName();
+                          if (e.key === 'Escape') handleCancelEdit();
+                        }}
+                        className="text-5xl font-black bg-slate-900/50 border-2 border-orange-500 rounded-xl px-4 py-2 focus:outline-none focus:border-yellow-400 text-white"
+                        placeholder="Enter name..."
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleSaveName}
+                        className="p-3 bg-green-600 hover:bg-green-700 rounded-xl transition-all duration-300 hover:scale-110"
+                        title="Save"
+                      >
+                        <Save className="w-6 h-6" />
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="p-3 bg-red-600 hover:bg-red-700 rounded-xl transition-all duration-300 hover:scale-110"
+                        title="Cancel"
+                      >
+                        <X className="w-6 h-6" />
+                      </button>
+                    </div>
+                  ) : (
+                    // VIEW MODE
+                    <div className="flex items-center gap-4 mb-3">
+                      <h1 className="text-6xl font-black bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-400 bg-clip-text text-transparent">
+                        {user.name}
+                      </h1>
+                      <button
+                        onClick={handleEditClick}
+                        className="p-2 glass-card hover:bg-orange-500/20 rounded-xl transition-all duration-300 hover:scale-110 group"
+                        title="Edit Name"
+                      >
+                        <Edit2 className="w-5 h-5 text-orange-400 group-hover:text-yellow-400" />
+                      </button>
+                      <button
+                        onClick={handleDeleteName}
+                        className="p-2 glass-card hover:bg-red-500/20 rounded-xl transition-all duration-300 hover:scale-110 group"
+                        title="Reset Name"
+                      >
+                        <Trash2 className="w-5 h-5 text-orange-400 group-hover:text-red-400" />
+                      </button>
+                    </div>
+                  )}
                   <p className="text-base text-orange-300/80">{user.email}</p>
                 </div>
                 <div className="flex gap-3">
@@ -259,7 +374,7 @@ export default function PlayerProfile() {
                     HIT RATE
                   </h3>
                 </div>
-                <div className="mb-6 text-sm text-orange-400/80 font-medium">FAKER (TI)</div>
+                <div className="mb-6 text-sm text-orange-400/80 font-medium">{user.name} (TI)</div>
                 
                 <div className="flex gap-3 mb-6">
                   <button className="px-4 py-2 bg-orange-600/50 border border-orange-500/50 rounded-lg text-sm font-medium hover:bg-orange-600/70 transition-all duration-300">
