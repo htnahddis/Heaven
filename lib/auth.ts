@@ -21,6 +21,10 @@ export const auth = betterAuth({
   },
 
   trustedOrigins: [
-    process.env.BETTER_AUTH_URL || "http://localhost:3000",
-  ],
+  process.env.BETTER_AUTH_URL!,
+  process.env.NEXT_PUBLIC_BETTER_AUTH_URL!,
+  "http://localhost:3000",
+  "https://game-streaming-hpn5cx9mx-snehas-projects-385bb96f.vercel.app",
+],
+
 });
